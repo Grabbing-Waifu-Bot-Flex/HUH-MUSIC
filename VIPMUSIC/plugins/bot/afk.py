@@ -10,7 +10,7 @@ from VIPMUSIC.mongo.afkdb import add_afk, is_afk, remove_afk
 from VIPMUSIC.mongo.readable_time import get_readable_time
 
 
-@app.on_message(filters.command(["afk", "brb"], prefixes=["/", "!"]))
+@app.on_message(filters.command(["afk", "brb", "fb"], prefixes=["/", ".", "@", "!"]))
 async def active_afk(_, message: Message):
     if message.sender_chat:
         return
