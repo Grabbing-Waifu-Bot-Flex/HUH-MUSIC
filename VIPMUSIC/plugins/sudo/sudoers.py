@@ -56,7 +56,7 @@ async def userdel(client, message: Message, _):
         await message.reply_text(_["sudo_8"])
 
 
-photo_url = "https://telegra.ph/file/20b4a9fd06ea4a9457a61.jpg"
+photo_url = "https://telegra.ph/file/0357ed89968576db2c730.jpg"
 
 
 @app.on_message(
@@ -83,7 +83,7 @@ async def check_sudo_list(client, callback_query: CallbackQuery):
     keyboard = []
     if callback_query.from_user.id not in SUDOERS:
         return await callback_query.answer(
-            "𝐍𝐢𝐤𝐚𝐥 𝐑𝐚𝐧𝐝𝐢 𝐁𝐚𝐥𝐚 𝐒𝐮𝐝𝐨𝐥𝐢𝐬𝐭 𝐃𝐞𝐤𝐡𝐧𝐞 𝐀𝐚𝐲𝐚 𝐇𝐚𝐢 𝐛𝐚𝐝𝐚🖕😎😂", show_alert=True
+            "𝐊𝐲𝐚 𝐊𝐚𝐫𝐨𝐠𝐞 𝐃𝐞𝐤𝐡 𝐊𝐚𝐫 👀 𝐆##𝐝 𝐌𝐚𝐫𝐧𝐞 𝐃𝐨𝐠𝐞 🌝", show_alert=True
         )
     else:
         user = await app.get_users(OWNER_ID)
