@@ -47,7 +47,7 @@ channel = ["channel"]
 # ========================================= #
 
 
-@Client.on_message(filters.command(["ip", "iyush"], prefixes=["V", "P"]) & admin_filter)
+@Client.on_message(filters.command(["lex", "oy"], prefixes=["F", "B"]) & admin_filter)
 async def restriction_app(client: Client, message):
     reply = message.reply_to_message
     chat_id = message.chat.id
