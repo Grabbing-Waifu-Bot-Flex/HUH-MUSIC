@@ -7,29 +7,29 @@ from pyrogram import filters
 
 load_dotenv()
 # Get this value from my.telegram.org/apps
-API_ID = int(getenv("API_ID"))
-API_HASH = getenv("API_HASH")
+API_ID = int(getenv("API_ID", "20533795"))
+API_HASH = getenv("API_HASH", "f6cadf28523943f525e706e6ace8a250")
 
 # Get your token from @BotFather on Telegram.
-BOT_TOKEN = getenv("BOT_TOKEN")
+BOT_TOKEN = getenv("BOT_TOKEN", "7405146014:AAF5Wie0qJWA53zxW_1kBJ6nNzMw9Va5Q6Y")
 
 # Get your mongo url from cloud.mongodb.com
-MONGO_DB_URI = getenv("MONGO_DB_URI", None)
+MONGO_DB_URI = getenv("MONGO_DB_URI", "mongodb+srv://Zxcdc:zxchypernjqjjqv8762@cluster0.hcgtozy.mongodb.net/?retryWrites=true&w=majority")
 
-DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 16000))
+DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 999999999))
 
 # Chat id of a group for logging bot's activities
-LOGGER_ID = int(getenv("LOGGER_ID"))
-LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", "-1001443337704"))
+LOGGER_ID = int(getenv("LOGGER_ID", "-1002078575375"))
+LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", "-1002078575375"))
 
 # Get this value from  on Telegram by /id
-OWNER_ID = int(getenv("OWNER_ID"))
+OWNER_ID = int(getenv("OWNER_ID", "6584789596"))
 
 # Fill these variables if you're deploying on heroku.
 # Your heroku app name
-HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
+HEROKU_APP_NAME = getenv("flex-music-x-opx")
 # Get it from http://dashboard.heroku.com/account
-HEROKU_API_KEY = getenv("HEROKU_API_KEY")
+HEROKU_API_KEY = getenv("HRKU-f768e60f-b57f-4587-81f1-110a599578fa)
 
 UPSTREAM_REPO = getenv(
     "UPSTREAM_REPO",
@@ -40,8 +40,8 @@ GIT_TOKEN = getenv(
     "GIT_TOKEN", None
 )  # Fill this variable if your upstream repository is private
 
-SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/VIP_CREATORS")
-SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/TG_FRIENDSS")
+SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/FleX_Bots_News")
+SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/Flex_Support_Chat")
 
 # Maximum Limit Allowed for users to save playlists on bot's server
 SERVER_PLAYLIST_LIMIT = int(getenv("SERVER_PLAYLIST_LIMIT", "100"))
@@ -95,7 +95,7 @@ CLEANMODE_DELETE_MINS = int(
 )  # Remember to give value in Seconds
 
 # Get your pyrogram v2 session from @VIP_STRING_ROBOT on Telegram
-STRING1 = getenv("STRING_SESSION", None)
+STRING1 = getenv("STRING_SESSION", "BQE5UiMAWc29BV3LHGXnRCirf5kABbHLJoyhHCieRlVKXcsP-kyRoZnItKUpnFBhsMYqJ-Dv-hOMEpWFTuNlD4vTqTEsIFfXdIvaB84i5ERJfG3GgarTut9iRx5Za21wK5WPW-U7JtNQ2jpOeHNJtoxKkZdynk9CBh58SGMg-pUwyr4s2P6YnUn2UCe3iG_ZslQ2uEyMZJ6LGszXb1qg7zm2f9eSWaj9ndyJ-03SyXpG0WjVFB_Tb5tjQlpyIhcuT9hgJCsfdqcKTw5Wr7YcLvlaV-GQKNPff8CmjctXvWMTXu_b80FWE8bpHao3z4sHiVi2iFT9QLQ0Kkbf92H_3JSd3osdUwAAAAF-Ni2lAA")
 STRING2 = getenv("STRING_SESSION2", None)
 STRING3 = getenv("STRING_SESSION3", None)
 STRING4 = getenv("STRING_SESSION4", None)
