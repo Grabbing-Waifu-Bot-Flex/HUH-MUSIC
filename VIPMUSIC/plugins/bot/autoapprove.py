@@ -121,7 +121,7 @@ async def autoapprove(client: app, message: ChatJoinRequest):
                     [
                         [
                             InlineKeyboardButton(
-                                "🌱ᴡᴇʟᴄᴏᴍᴇ ᴅᴇᴀʀ🌱",
+                                "ᴡᴇʟᴄᴏᴍᴇ ᴅᴇᴀʀ",
                                 url=f"https://t.me/{app.username}?startgroup=true",
                             )
                         ]
