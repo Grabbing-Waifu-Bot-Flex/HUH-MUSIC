@@ -9,11 +9,11 @@ from pyrogram.types import ChatJoinRequest, InlineKeyboardButton, InlineKeyboard
 from VIPMUSIC import app
 
 random_photo = [
-    "https://telegra.ph/file/1949480f01355b4e87d26.jpg",
-    "https://telegra.ph/file/3ef2cc0ad2bc548bafb30.jpg",
-    "https://telegra.ph/file/a7d663cd2de689b811729.jpg",
-    "https://telegra.ph/file/6f19dc23847f5b005e922.jpg",
-    "https://telegra.ph/file/2973150dd62fd27a3a6ba.jpg",
+    "https://telegra.ph/file/e1f656a00762c343c36f6.jpg",
+    "https://telegra.ph/file/206f8f0a96d2a39c68002.jpg",
+    "https://telegra.ph/file/a9856d9ee59f1b0db8d92.jpg",
+    "https://telegra.ph/file/7c36f2acd92a703a194db.jpg",
+    "https://telegra.ph/file/63267c5372194dacd0bf9.jpg",
 ]
 
 # --------------------------------------------------------------------------------- #
