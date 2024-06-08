@@ -29,7 +29,7 @@ OWNER_ID = int(getenv("OWNER_ID", "6584789596"))
 # Your heroku app name
 HEROKU_APP_NAME = getenv("flex-music-x-opx")
 # Get it from http://dashboard.heroku.com/account
-HEROKU_API_KEY = getenv("HRKU-f768e60f-b57f-4587-81f1-110a599578fa)
+HEROKU_API_KEY = getenv("HRKU-f768e60f-b57f-4587-81f1-110a599578fa")
 
 UPSTREAM_REPO = getenv(
     "UPSTREAM_REPO",
