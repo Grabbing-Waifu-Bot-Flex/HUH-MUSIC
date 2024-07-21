@@ -1,99 +1,184 @@
-I understand you're trying to display an image along with the rarity message based on the user's selection in your Telegram bot. You haven't provided the `harem` function which is crucial to give you a complete solution, but I can guide you on how to achieve this.
+#🔹𝐅𝐋𝐄𝐗 𝐁𝐎𝐘🔹 💠:
+#Sᴘɪʀɪᴛ⚡ᴍᴏɴᴀʀᴄʜ:
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CommandHandler, CallbackQueryHandler, CallbackContext
+from itertools import groupby
+import math
+import random
+from html import escape
+from shivu import collection, user_collection, application
 
-**Assumptions:**
+MAX_CAPTION_LENGTH = 1024
 
-- You have a database or a way to associate images with each rarity level (e.g., a dictionary mapping rarity to image URLs). 
-- The `harem` function already fetches data based on the selected rarity.
-
-**Modified Code:**
-
-```python
-from telegram import Update
-from telegram.error import BadRequest
-from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, filters
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
-
-# ... (other imports and database connection)
-
-RARITY_IMAGES = {
-    "🟤 Bronze waifu": "url_to_bronze_image",
-    "⚪ Silver waifu": "url_to_silver_image",
-    "🟡 Gold waifu": "url_to_gold_image",
-    "💎 Daimond waifu": "url_to_diamond_image",
-    "💮 Elite waifu": "url_to_elite_image",
-    "🎗 Master waifu": "url_to_master_image",
-    "All": "url_to_default_image"  # Or None if you don't want an image for "All"
+# Define rarity emojis
+RARITY_MAPPING = {
+    '🟤 Bronze waifu': '🟤',
+    '⚪ Silver waifu': '⚪',
+    '🟡 Gold waifu': '🟡',
+    '💎 Daimond waifu': '💎',
+    '💮 Elite waifu': '💮',
+    '🎗 Master waifu': '🎗'
 }
 
-# ... (other functions: _send_harem_message, _send_text_message, 
-#                     haremmode, error, get_user_rarity_mode)
+async def harem(update: Update, context: CallbackContext, page=0) -> None:
+    user_id = update.effective_user.id
+    user = await user_collection.find_one({'id': user_id})
+    if not user:
+        message = 'You Have Not Guessed any Characters Yet..'
+        if update.message:
+            await update.message.reply_text(message)
+        else:
+            await update.callback_query.edit_message_text(message)
+        return
 
-async def update_user_rarity_mode(user_id: int, rarity_mode: str) -> None:
+    characters = sorted(user['characters'], key=lambda x: (x['anime'], x['id']))
+    character_counts = {k: len(list(v)) for k, v in groupby(characters, key=lambda x: x['id'])}
+    rarity_mode = await get_user_rarity_mode(user_id)
+
+    if rarity_mode!= 'All':
+        characters = [char for char in characters if char.get('rarity') == rarity_mode]
+
+    total_pages = math.ceil(len(characters) / 15)
+    if page < 0 or page >= total_pages:
+        page = 0
+
+    harem_message = f"{escape(update.effective_user.first_name)}'s Harem - Page {page+1}/{total_pages}\n\n"
+    current_characters = characters[page*15:(page+1)*15]
+    current_grouped_characters = {k: list(v) for k, v in groupby(current_characters, key=lambda x: x['anime'])}
+
+    for anime, characters in current_grouped_characters.items():
+        harem_message += f"➥ {anime} ｛{len(characters)}/{character_counts[characters[0]['id']]}｝\n"
+        for character in characters:
+            count = character_counts[character['id']]
+            rarity = character['rarity']
+            rarity_emoji = RARITY_MAPPING.get(rarity, 'Unknown')
+            harem_message += f"➹ {character['id']} [{rarity_emoji}] {character['name']} ×{count}\n"
+        harem_message += "\n"
+
+    if len(harem_message) > MAX_CAPTION_LENGTH:
+        harem_message = harem_message[:MAX_CAPTION_LENGTH]
+
+    total_count = len(user['characters'])
+    keyboard = [
+        [InlineKeyboardButton(f"See Collection ({total_count})", switch_inline_query_current_chat=f"collection.{user_id}")]
+    ]
+
+    if total_pages > 1:
+        nav_buttons = []
+        if page > 0:
+            nav_buttons.append(InlineKeyboardButton("⬅️ Previous", callback_data=f"harem:{page-1}"))
+        if page < total_pages - 1:
+            nav_buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"harem:{page+1}"))
+        keyboard.append(nav_buttons)
+    
+    # Add a close button
+    keyboard.append([InlineKeyboardButton("Close", callback_data="close")])
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    try:
+        if 'favorites' in user and user['favorites']:
+            fav_character_id = user['favorites'][0]
+            fav_character = next((c for c in user['characters'] if c['id'] == fav_character_id), None)
+            if fav_character and 'img_url' in fav_character:
+                if update.message:
+                    await update.message.reply_photo(photo=fav_character['img_url'], caption=harem_message, reply_markup=reply_markup)
+                else:
+                    try:
+                        await update.callback_query.edit_message_caption(caption=harem_message, reply_markup=reply_markup)
+                    except BadRequest:
+                        await update.callback_query.edit_message_reply_markup(reply_markup=reply_markup)
+            else:
+                await _send_harem_message(update, harem_message, reply_markup)
+        else:
+            await _send_harem_message(update, harem_message, reply_markup, user['characters'])
+    except Exception as e:
+        print(f"Failed to edit message: {e}")
+
+async def _send_harem_message(update, harem_message, reply_markup, characters=None):
+    if characters:
+        random_character = random.choice(characters)
+        if 'img_url' in random_character:
+            if update.message:
+                await update.message.reply_photo(photo=random_character['img_url'], caption=harem_message, reply_markup=reply_markup)
+            else:
+                try:
+                    await update.callback_query.edit_message_caption(caption=harem_message, reply_markup=reply_markup)
+                except BadRequest:
+                    await update.callback_query.edit_message_reply_markup(reply_markup=reply_markup)
+        else:
+            await _send_text_message(update, harem_message, reply_markup)
+    else:
+        await _send_text_message(update, harem_message, reply_markup)
+
+async def _send_text_message(update, text, reply_markup):
+    if update.message:
+        await update.message.reply_text(text, reply_markup=reply_markup)
+    else:
+        try:
+            await update.callback_query.edit_message_caption(caption=text, reply_markup=reply_markup)
+        except BadRequest:
+            await update.callback_query.edit_message_reply_markup(reply_markup=reply_markup)
+
+async def haremmode(update: Update, context: CallbackContext):
+    rarities_buttons = [
+        [InlineKeyboardButton("🟤 Bronze waifu", callback_data="rarity:🟤 Bronze waifu"), InlineKeyboardButton("⚪ Silver waifu", callback_data="rarity:⚪ Silver waifu"), InlineKeyboardButton("🟡 Gold waifu", callback_data="rarity:🟡 Gold waifu")],
+        [InlineKeyboardButton("💎 Daimond waifu", callback_data="rarity:💎 Daimond waifu"), InlineKeyboardButton("💮 Elite waifu", callback_data="rarity:💮 Elite waifu"), InlineKeyboardButton("🎗 Master waifu", callback_data="rarity:🎗 Master waifu")],
+        [InlineKeyboardButton("All", callback_data="rarity:All")]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(rarities_buttons)
+
+    image_url = "https://graph.org/file/784e1f73497c553604b46.jpg" # Replace with your actual image URL
+
+    if update.message:
+        await context.bot.send_photo(
+            chat_id=update.effective_chat.id,
+            photo=image_url,
+            caption="Select a rarity mode:",  
+            reply_markup=reply_markup  
+        )
+    else:
+        await update.callback_query.message.edit_media(
+            media=InputMediaPhoto(media=image_url, caption="Select a rarity mode:"),
+            reply_markup=reply_markup
+        )
+
+async def error(update: Update, context: CallbackContext):
+    print(f"Update {update} caused error {context.error}")
+
+async def get_user_rarity_mode(user_id: int) -> str:
+    user = await user_collection.find_one({'id': user_id})
+    return user.get('rarity_mode', 'All') if user else 'All'
+
+async def update_user_rarity_mode(user_id: int, rarity_mode: int) -> None:
     await user_collection.update_one({'id': user_id}, {'$set': {'rarity_mode': rarity_mode}}, upsert=True)
 
+async def pagination_callback(update: Update, context: CallbackContext):
+    query = update.callback_query
+    data = query.data
+    print(f"Received callback query: {data}")
+    page = int(data.split(':')[1])
+    await harem(update, context, page)
 
 async def haremmode_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     data = query.data
+    print(f"Received callback query: {data}")
     if data.startswith('rarity:'):
-        rarity_mode = data.split(':')[1] 
+        rarity_mode = int(data.split(':')[1])
         user_id = update.effective_user.id
         await update_user_rarity_mode(user_id, rarity_mode)
         await query.answer()
-        await harem(update, context, 0, rarity_mode)  # Pass rarity_mode to harem 
+        await harem(update, context, 0)  # Call the harem function with page 0
     else:
         await query.answer(text='Invalid callback query')
 
-# Example harem function (You need to implement the actual logic)
-async def harem(update: Update, context: CallbackContext, page=0, rarity_mode="All"):
-    user_id = update.effective_user.id  
-    user = await user_collection.find_one({'id': user_id})
-    # ... (Your logic to get characters based on rarity_mode)
-   
-    # ... (Construct harem_message based on fetched data)
+application.add_handler(CommandHandler("hmode", haremmode))
+application.add_handler(CommandHandler("harem", harem))
 
-    # Get image URL based on selected rarity
-    image_url = RARITY_IMAGES.get(rarity_mode)
+application.add_handler(CallbackQueryHandler(pagination_callback, pattern='^harem:'))
+application.add_handler(CallbackQueryHandler(lambda u, c: u.callback_query.message.delete(), pattern='^close$'))
+application.add_handler(CallbackQueryHandler(haremmode_callback, pattern=r'rarity:\d+'))
 
-    if image_url:
-        # Send message with image
-        if update.message:
-            await context.bot.send_photo(
-                chat_id=update.effective_chat.id,
-                photo=image_url,
-                caption=harem_message, 
-                reply_markup=reply_markup  
-            )
-        else:
-            await update.callback_query.message.edit_media(
-                media=InputMediaPhoto(media=image_url, caption=harem_message),
-                reply_markup=reply_markup
-            )
-    else:
-        # Send message without image
-        await _send_text_message(update, harem_message, reply_markup)
-
-# ... (Rest of your code)
-```
-
-**Explanation:**
-
-1. **`RARITY_IMAGES` Dictionary:**
-   - Create a dictionary `RARITY_IMAGES` to map rarity modes to corresponding image URLs. Replace `"url_to_{rarity}_image"` with the actual URLs of your images.
-
-2. **Pass `rarity_mode` to `harem`:**
-   - In the `haremmode_callback`, after updating the rarity mode, call the `harem` function and pass the selected `rarity_mode` to it.
-
-3. **`harem` Function Logic:**
-   - **Get Image URL:** Inside the `harem` function, use the passed `rarity_mode` to fetch the corresponding image URL from the `RARITY_IMAGES` dictionary:
-     ```python
-     image_url = RARITY_IMAGES.get(rarity_mode) 
-     ```
-   - **Send Photo with Caption:** If `image_url` is not None, use `context.bot.send_photo()` (for messages) or  `update.callback_query.message.edit_media()` (for callback queries) to send the image along with the `harem_message` as the caption.
-
-**Important:**
-
-- **Implement `harem` Function:** You still need to implement the logic for fetching and formatting the actual harem data based on the `rarity_mode` in the `harem` function.
-- **Error Handling:** Consider adding error handling in case an image URL is invalid or inaccessible.
-
-With these changes, when a user selects a rarity mode, the bot will now display the corresponding image along with the harem message.
+application.add_error_handler(error)
